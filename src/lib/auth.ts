@@ -1,12 +1,15 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { db } from "./db";
 import { compare } from "bcrypt";
+import { Pool } from "pg";
 
+// Create a Postgres pool connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 export const authOptions: NextAuthOptions = {
-    adapter: PrismaAdapter(db),
+    // adapter: PrismaAdapter(db),
     secret: process.env.NEXTAUTH_SECRET,
     session:{
       strategy: 'jwt',
@@ -25,24 +28,33 @@ export const authOptions: NextAuthOptions = {
             if(!credentials?.email || !credentials?.password) {
               return null;
             }
-            
-            const existingUser = await db.user.findUnique({
-              where: {email: credentials?.email}
-            });
-            if(!existingUser) {
+            try {
+              // Query to find the user by email
+              const { rows } = await pool.query(
+                'SELECT * FROM "User" WHERE email = $1',
+                [credentials.email]
+              );
+              const existingUser = rows[0];
+    
+              if (!existingUser) {
+                return null;
+              }
+    
+              // Compare passwords
+              const passwordMatch = await compare(credentials.password, existingUser.password);
+    
+              if (!passwordMatch) {
+                return null;
+              }
+    
+              return {
+                id: `${existingUser.id}`,
+                username: existingUser.username,
+                email: existingUser.email,
+              };
+            } catch (error) {
+              console.error("Error during authentication", error);
               return null;
-            }
-
-            const passwordMatch = await compare(credentials.password, existingUser.password);
-
-            if(!passwordMatch){
-              return null;
-            }
-
-            return {
-              id: `${existingUser.id}`,
-              username: existingUser.username,
-              email: existingUser.email,
             }
           }
         })

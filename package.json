@@ -28,6 +28,7 @@
     "lucide-react": "^0.263.1",
     "next": "^14.2.13",
     "next-auth": "^4.24.7",
+    "pg": "^8.13.0",
     "postcss": "8.4.27",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.5.5",
+    "@types/pg": "^8.11.10",
     "prisma": "^5.19.1"
   }
 }
