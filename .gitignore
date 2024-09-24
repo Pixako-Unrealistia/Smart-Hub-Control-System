@@ -1,0 +1,7 @@
+/auth/.env.local
+/auth/.next
+/auth/node_modules
+
+/frontend/.env.local
+/frontend/.next
+/frontend/node_modules
