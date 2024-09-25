@@ -16,7 +16,7 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import GoogleSignInButton from '../GoogleSignInButton';
 import { useRouter } from 'next/navigation';
-import { useToast } from "../../hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 const FormSchema = z
   .object({

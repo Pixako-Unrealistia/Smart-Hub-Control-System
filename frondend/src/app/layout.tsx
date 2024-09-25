@@ -1,9 +1,9 @@
-import Navbar from '../components/Navbar';
+import Navbar from '@/components/Navbar';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { Toaster } from "../components/ui/toaster"
-import Provider from '../components/Provider';
+import { Toaster } from "@/components/ui/toaster"
+import Provider from '@/components/Provider';
 
 
 const inter = Inter({ subsets: ['latin'] });
