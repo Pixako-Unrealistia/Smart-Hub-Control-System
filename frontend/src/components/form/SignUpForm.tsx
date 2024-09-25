@@ -47,20 +47,21 @@ const SignUpForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    const responce = await fetch('/api/user',{
+    console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/user`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         username: values.username,
         email: values.email,
         password: values.password,
-        
-      })
-    })
+      }),
+    });
 
-    if(responce.ok){
+
+    if(response.ok){
       router.push('/sign-in');
     } else {
       toast({

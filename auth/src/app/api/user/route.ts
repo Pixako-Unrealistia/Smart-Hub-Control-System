@@ -4,20 +4,31 @@ import { hash } from 'bcrypt';
 import * as z from 'zod';
 
 // Define a schema for input validation
-const userSchema = z
-  .object({
-    username: z.string().min(1, 'Username is required').max(100),
-    email: z.string().min(1, 'Email is required').email('Invalid email'),
-    password: z
-      .string()
-      .min(1, 'Password is required')
-      .min(8, 'Password must have more than 8 characters'),
-  });
+const userSchema = z.object({
+  username: z.string().min(1, 'Username is required').max(100),
+  email: z.string().min(1, 'Email is required').email('Invalid email'),
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .min(8, 'Password must have more than 8 characters'),
+});
 
 // Initialize the Postgres pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+// Handle OPTIONS requests for CORS preflight
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: {
+      'Access-Control-Allow-Origin': process.env.NEXTAUTH_URL || 'http://localhost:3000',  // Remove trailing slash
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true',
+    },
+  });
+}
 
 export async function POST(req: Request) {
   try {
