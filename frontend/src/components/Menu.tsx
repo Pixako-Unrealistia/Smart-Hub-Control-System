@@ -17,8 +17,8 @@ const menuItems = [
       },
       {
         icon: SquareActivity,
-        label: "Power Monitoring",
-        href: "/power-monitoring",
+        label: "Devices",
+        href: "/devices",
       }
 
     ],
