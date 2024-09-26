@@ -11,7 +11,7 @@ const Navbar = async () => {
   return (
     <div className=' flex items-center justify-between p-4'>
       <div className='container flex justify-end'>
-        <CircleUser color="#9ca3af" size={40} />
+        <CircleUser color="#9ca3af" size={40} strokeWidth={2} />
       </div>
     </div>
   );

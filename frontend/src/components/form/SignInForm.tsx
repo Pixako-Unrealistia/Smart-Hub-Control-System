@@ -53,7 +53,7 @@ const SignInForm = () => {
         variant: "destructive" 
       })
       // console.log(signInData.error);
-    } else {
+    } else if (signInData?.ok){
       window.location.href = '/home';  // Force full reload to ensure session is reflected
     }
   };

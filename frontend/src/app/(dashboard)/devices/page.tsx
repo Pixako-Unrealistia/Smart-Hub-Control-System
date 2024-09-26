@@ -4,6 +4,8 @@ import React from 'react'
 import StatusCard from '../../../components/StatusCard';
 import UsageCard from '../../../components/UsageCard';
 import SmartHubCard from '../../../components/SmartHubCard';
+import { EllipsisVertical } from 'lucide-react';
+import AddHub from '../../../components/AddHub';
 
 const page = async () => {
     const session = await getServerSession(authOptions);
@@ -11,9 +13,11 @@ const page = async () => {
     if(session?.user) {
         return (
           <div className='grid grid-cols-2 lg:grid-cols-4 gap-5 p-10'>
-            <h2 className='text-2xl col-span-2 lg:col-span-4 text-start'>
-                All Devices
-            </h2>
+            <div className='flex justify-between items-center col-span-2 lg:col-span-4'>
+                <h1 className='text-2xl'>All devices</h1>
+                <AddHub />
+                {/* <Popup /> */}
+            </div>
             <SmartHubCard id='2313A' location='Bangkok' powerUsage={100} isOnline = {true} />
             <SmartHubCard id='2313A' location='Nakhorn Pathom' powerUsage={200} isOnline = {true} />
             <SmartHubCard id='2313A' location='Chiang Mai' powerUsage={300} isOnline = {true} />
