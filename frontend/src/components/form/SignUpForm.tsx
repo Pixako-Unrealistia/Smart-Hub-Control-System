@@ -59,8 +59,6 @@ const SignUpForm = () => {
         password: values.password,
       }),
     });
-
-
     if(response.ok){
       router.push('/sign-in');
     } else {
