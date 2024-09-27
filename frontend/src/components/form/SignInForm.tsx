@@ -19,8 +19,6 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast"
 
-
-
 const FormSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email'),
   password: z

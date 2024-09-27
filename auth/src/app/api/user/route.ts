@@ -22,7 +22,7 @@ const pool = new Pool({
 export async function OPTIONS() {
   return NextResponse.json({}, {
     headers: {
-      'Access-Control-Allow-Origin': process.env.NEXTAUTH_URL || 'http://localhost:3000',  // Remove trailing slash
+      'Access-Control-Allow-Origin': process.env.FRONTEND_URL || 'http://localhost:3000',  // Remove trailing slash
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Allow-Credentials': 'true',
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const { email, username, password } = userSchema.parse(body);
 
     // Check if email already exists
-    const emailCheckQuery = 'SELECT * FROM "User" WHERE email = $1';
+    const emailCheckQuery = 'SELECT * FROM "users" WHERE email = $1';
     const { rows: existingUserByEmail } = await pool.query(emailCheckQuery, [email]);
 
     if (existingUserByEmail.length > 0) {
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     // Check if username already exists
-    const usernameCheckQuery = 'SELECT * FROM "User" WHERE username = $1';
+    const usernameCheckQuery = 'SELECT * FROM "users" WHERE username = $1';
     const { rows: existingUserByUsername } = await pool.query(usernameCheckQuery, [username]);
 
     if (existingUserByUsername.length > 0) {
@@ -62,9 +62,9 @@ export async function POST(req: Request) {
 
     // Create the new user
     const createUserQuery = `
-    INSERT INTO "User" (username, email, password, "createdAt", "updatedAt")
+    INSERT INTO "users" (username, email, password, "created_at", "updated_at")
     VALUES ($1, $2, $3, NOW(), NOW())
-    RETURNING id, username, email, "createdAt", "updatedAt";
+    RETURNING id, username, email, "created_at", "updated_at";
   `;
     const { rows: newUser } = await pool.query(createUserQuery, [username, email, hashedPassword]);
 

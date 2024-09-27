@@ -4,7 +4,7 @@ export function middleware(req: NextRequest) {
   const response = NextResponse.next();
 
   // Allow requests from specific origin (your frontend URL)
-  const allowedOrigin = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
 
   response.headers.set('Access-Control-Allow-Origin', allowedOrigin);
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');

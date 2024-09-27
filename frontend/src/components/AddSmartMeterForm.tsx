@@ -15,11 +15,11 @@ const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClos
         <h2 className="text-2xl font-semibold mb-4">Add New Smart Meter Hub</h2>
         <form className="space-y-4">
           <div>
-            <label htmlFor="id" className="block text-sm font-medium text-gray-700">ID:</label>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name:</label>
             <input
               type="text"
-              id="id"
-              name="id"
+              id="name"
+              name="name"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>

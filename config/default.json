@@ -1,0 +1,20 @@
+[
+    {
+        "meter_id": "meter1",
+        "display_name": "Meter 1",
+        "state": false,
+        "config": {
+            "location": "Room A",
+            "type": "electric"
+        }
+    },
+    {
+        "meter_id": "meter2",
+        "display_name": "Meter 2",
+        "state": true,
+        "config": {
+            "location": "Room B",
+            "type": "water"
+        }
+    }
+]

@@ -5,12 +5,13 @@ import { Power, Zap, Server } from "lucide-react";
 
 interface SmartHubCardProps {
   id: string;
+  name: string;
   location: string;
   powerUsage: number;
   isOnline: boolean;
 }
 
-const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, location, powerUsage, isOnline }) => {
+const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, name, location, powerUsage, isOnline }) => {
   const [showPowerIcon, setShowPowerIcon] = useState(false);
   const router = useRouter();
 
@@ -56,7 +57,7 @@ const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, location, powerUsage, i
       </div>
 
       {/* Title */}
-      <div className="text-lg font-semibold">Smart Meter Hub</div>
+      <div className="text-lg font-semibold">{name}</div>
 
       {/* Location */}
       <div className={`text-sm ${isOnline ? "text-gray-600" : "text-gray-400"}`}>
