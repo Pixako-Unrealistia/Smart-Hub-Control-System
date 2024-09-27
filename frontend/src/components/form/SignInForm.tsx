@@ -39,20 +39,36 @@ const SignInForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    const signInData = await signIn('credentials', {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    })
-    if(signInData?.error) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+        credentials: 'include',  // Ensure cookies are sent
+      });
+  
+      if (response.ok) {
+        window.location.href = '/home';  // Redirect user to the home/dashboard page
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.message || 'Login failed. Please try again.',
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
       toast({
         title: "Error",
-        description: "Please check your email and password and try again.",
-        variant: "destructive" 
-      })
-      // console.log(signInData.error);
-    } else if (signInData?.ok){
-      window.location.href = '/home';  // Force full reload to ensure session is reflected
+        description: 'An error occurred. Please try again.',
+        variant: "destructive"
+      });
     }
   };
 

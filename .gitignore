@@ -1,4 +1,5 @@
 /auth/.env.local
+/auth/.env
 /auth/.next
 /auth/node_modules
 
@@ -18,6 +19,10 @@
 /user-management/.next
 /user-management/node_modules
 
+/auth-legacy/.env.local
+/auth-legacy/.env
+/auth-legacy/.next
+/auth-legacy/node_modules
 
 /mock_data/individuals
 /mock_data/halfhourly_dataset
