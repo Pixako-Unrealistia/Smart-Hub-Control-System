@@ -7,7 +7,11 @@ import SmartHubCard from '../../../components/SmartHubCard';
 import AddSmartMeterForm from '../../../components/AddSmartMeterForm'; // Import the AddSmartMeterForm component
 
 const Page = () => {
-  const [user, setUser] = useState(null);
+  interface User {
+    id: string;
+  }
+  
+  const [user, setUser] = useState<User | null>(null);
   const [hubs, setHubs] = useState([]);  
   const [isModalVisible, setModalVisible] = useState(false); // To show/hide the form modal
   const router = useRouter();  
@@ -104,10 +108,13 @@ const Page = () => {
       <AddSmartMeterForm 
         isVisible={isModalVisible}
         onClose={closeModal}
-        onHubAdded={handleHubAdded} // Pass the callback to refresh the list
-        hubId={''} onMeterAdded={function (): void {
+        onHubAdded={handleHubAdded}
+        userId={user.id}  // Pass the logged-in user's ID as a prop
+        hubId={''} 
+        onMeterAdded={function (): void {
           throw new Error('Function not implemented.');
-        } }      />
+        }}      
+      />
     </div>
   );
 };

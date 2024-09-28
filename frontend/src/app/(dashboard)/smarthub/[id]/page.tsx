@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';  // Import useParams to get the dynamic id
+import { useParams, useRouter } from 'next/navigation';  // Import useParams to get the dynamic id
 
 import MeterCard from '../../../../components/MeterCard';
 import DropdownMenu from '../../../../components/DropdownMenu';
 
 const Page = () => {
+  const router = useRouter(); 
   const [user, setUser] = useState(null);  // State for user info
   interface Meter {
     id: string;
@@ -86,7 +87,8 @@ const Page = () => {
 
   // Handle the hub deletion
   const handleHubDeleted = () => {
-    window.location.href = '/devices';  // Redirect to home or another page after hub is deleted
+    // window.location.href = '/devices'; 
+    router.push('/devices');  // Redirect to the devices page after deleting the hub
   };
 
   return (

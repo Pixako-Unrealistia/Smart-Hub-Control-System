@@ -10,27 +10,33 @@ interface AddSmartMeterFormProps {
 }
 
 
-const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClose, onHubAdded }) => {
-  const [hub_name, setName] = useState('');  // State to hold the name of the smart hub
-  const [location, setLocation] = useState('');  // State to hold the location of the smart hub
-  const [error, setError] = useState('');  // State to hold validation errors
+interface AddSmartMeterFormProps {
+  isVisible: boolean;
+  onClose: () => void;
+  onHubAdded: () => void;
+  hubId: string;
+  onMeterAdded: () => void;
+  userId: string;  // Add userId prop
+}
+
+const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClose, onHubAdded, userId }) => {
+  const [hub_name, setName] = useState('');  
+  const [location, setLocation] = useState('');  
+  const [error, setError] = useState('');  
 
   if (!isVisible) return null;
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    // Assuming user_id is available from session or context
-    const user_id = 1;  // Replace with actual user_id
-  
+    
     if (!hub_name || !location) {
       setError('Please fill in both fields.');
       return;
     }
   
-    setError('');  // Clear any previous errors
-  
+    setError('');  
+    console.log('processe.env.NEXT_PUBLIC_CREATE_HUB_SERVICE_URL', process.env.NEXT_PUBLIC_CREATE_HUB_SERVICE_URL);
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_CREATE_HUB_SERVICE_URL}/api/hubs`, {
         method: 'POST',
@@ -38,17 +44,16 @@ const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClos
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id,
+          user_id: userId,  // Use the passed userId prop
           hub_name,
           location,
-          
         }),
       });
   
       if (response.ok) {
         console.log('Smart Meter Hub added successfully!');
-        onHubAdded();  // Notify the parent component to refresh the hub list
-        onClose();  // Close the form after successful submission
+        onHubAdded();  
+        onClose();  
       } else {
         console.error('Failed to add the Smart Meter Hub.');
         setError('Failed to add the Smart Meter Hub. Please try again.');
@@ -72,7 +77,7 @@ const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClos
               id="hub_name"
               name="hub_name"
               value={hub_name}
-              onChange={(e) => setName(e.target.value)}  // Update state on input change
+              onChange={(e) => setName(e.target.value)}  
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               required
             />
@@ -84,7 +89,7 @@ const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClos
               id="location"
               name="location"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}  // Update state on input change
+              onChange={(e) => setLocation(e.target.value)}  
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               required
             />
