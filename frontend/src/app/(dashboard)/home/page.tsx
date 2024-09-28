@@ -13,6 +13,7 @@ const Page = () => {
     const fetchUserData = async () => {
       try {
         // Fetch user data directly without manually handling the token
+        console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           method: 'GET',
           credentials: 'include',  // Ensure cookies are sent with the request

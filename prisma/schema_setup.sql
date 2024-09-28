@@ -10,22 +10,25 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the smart_meter_hubs table
+-- Create the smart_meter_hubs table with location and is_online
 CREATE TABLE IF NOT EXISTS smart_meter_hubs (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     hub_name VARCHAR(255) NOT NULL,
+    location VARCHAR(255),  -- Location field for hub
+    is_online BOOLEAN DEFAULT false, -- New is_online field to track if hub is online
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the meters table
+-- Create the meters table with name and location
 CREATE TABLE IF NOT EXISTS meters (
     id SERIAL PRIMARY KEY,
     hub_id INTEGER REFERENCES smart_meter_hubs(id) ON DELETE CASCADE,
     meter_id VARCHAR(255) UNIQUE NOT NULL,  -- Unique identifier (e.g., MAC000002)
-    display_name VARCHAR(255) NOT NULL,
-    state BOOLEAN DEFAULT TRUE,  -- Meter active/inactive
+    name VARCHAR(255) NOT NULL,             -- Name field for the meter
+    location VARCHAR(255),                  -- Location field for the meter
+    state BOOLEAN DEFAULT TRUE,             -- Meter active/inactive
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -78,3 +81,17 @@ CREATE TRIGGER update_meter_data_timestamp
 BEFORE UPDATE ON meter_data
 FOR EACH ROW
 EXECUTE PROCEDURE update_timestamp();
+
+-- Adding the new smart_hubs table
+CREATE TABLE IF NOT EXISTS smart_hubs (
+    id SERIAL PRIMARY KEY,
+    hub_name VARCHAR(100),
+    location VARCHAR(255),
+    user_id INTEGER NOT NULL,  -- Foreign key for the user who owns the hub
+    is_online BOOLEAN DEFAULT false, -- Indicates whether the hub is online
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Add is_online to smart_meter_hubs if not already added
+ALTER TABLE smart_meter_hubs ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT false;

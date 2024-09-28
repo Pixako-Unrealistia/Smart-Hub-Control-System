@@ -1,78 +1,113 @@
-import { authOptions } from '@/lib/auth'
-import { getServerSession } from 'next-auth'
-import React from 'react'
-import StatusCard from '../../../components/StatusCard';
-import UsageCard from '../../../components/UsageCard';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { CirclePlus } from 'lucide-react';  // Import the CirclePlus icon
 import SmartHubCard from '../../../components/SmartHubCard';
-import { EllipsisVertical } from 'lucide-react';
-import AddHub from '../../../components/AddHub';
+import AddSmartMeterForm from '../../../components/AddSmartMeterForm'; // Import the AddSmartMeterForm component
 
-const fetchHubs = async () => {
-  const response = await fetch(`${process.env.NEXT_USR_URL}/api/hub`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include', // Include credentials to pass the session token
-  });
+const Page = () => {
+  const [user, setUser] = useState(null);
+  const [hubs, setHubs] = useState([]);  
+  const [isModalVisible, setModalVisible] = useState(false); // To show/hide the form modal
+  const router = useRouter();  
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch smart meter hubs');
-  }
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+        method: 'GET',
+        credentials: 'include',  
+      });
 
-  const data = await response.json();
-  return data.hubs;
-}
+      console.log('API response:', response);  
 
-const Page = async () => {
-  const session = await getServerSession(authOptions);
+      if (response.ok) {
+        const userData = await response.json();
+        console.log('Fetched user data:', userData);  
+        setUser(userData);  
+       
+        console.log('NEXT_METER_HUB:', process.env.NEXT_PUBLIC_METER_HUB);
+        const hubsResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_HUB}/api/hubs/user/${userData.id}`, {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-  if (!session?.user) {
-    return (
-      <h2>
-        Please login to see this home page
-      </h2>
-    );
-  }
+        if (hubsResponse.ok) {
+          const hubsData = await hubsResponse.json();
+          setHubs(hubsData); 
+        } else {
+          console.error('Failed to fetch smart hubs');
+        }
+      } else {
+        console.log('Invalid token or response issue, redirecting to sign-in');
+        router.push('/sign-in'); 
+      }
+    } catch (error) {
+      console.error('Error fetching user data or smart hubs:', error);
+      router.push('/sign-in'); 
+    }
+  };
 
-  let hubs;
-  try {
-    hubs = await fetchHubs();
-  } catch (error) {
-    return (
-      <div>
-        <h2>Error fetching smart meter hubs. Please try again later.</h2>
-      </div>
-    );
-  }
+  // Fetch the user data and hubs when the component mounts
+  useEffect(() => {
+    fetchUserData(); 
+  }, [router]);
 
-  if (hubs.length === 0) {
-    return (
-      <div className="p-10">
-        <h2>No smart meter hubs found. Please add one.</h2>
-        <AddHub />
-      </div>
-    );
+  // Callback to refresh the hubs after adding a new one
+  const handleHubAdded = () => {
+    fetchUserData(); // Re-fetch the hubs when a new hub is added
+  };
+
+  // Function to open the modal
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  if (!user) {
+    return <h2>Loading...</h2>;  
   }
 
   return (
     <div className='grid grid-cols-2 lg:grid-cols-4 gap-5 p-10'>
       <div className='flex justify-between items-center col-span-2 lg:col-span-4'>
         <h1 className='text-2xl'>All devices</h1>
-        <AddHub />
+        {/* Circular button with CirclePlus icon */}
+        <button 
+          onClick={openModal} 
+        >
+          <CirclePlus size={24} color={'#9ca3af'} strokeWidth={2} absoluteStrokeWidth />
+        </button>
       </div>
-      {hubs.map((hub: any) => (
-        <SmartHubCard
-          key={hub.id}
-          name={hub.hub_name}
-          id={hub.id}
-          location={hub.location || "Location Info"}  // You can adjust this as needed
-          powerUsage={hub.powerUsage || 0}  // Ensure default value if powerUsage is not available
-          isOnline={hub.isOnline || false}
-        />
-      ))}
+
+      {/* Smart hubs list */}
+      {hubs.length === 0 ? (
+        <h2 className="col-span-2 lg:col-span-4 text-center">No hubs available. Please add a hub.</h2>
+      ) : (
+        hubs.map((hub: any) => (
+          <SmartHubCard 
+            key={hub.id} 
+            name={hub.hub_name} 
+            id={hub.id} 
+            location={hub.location} 
+            powerUsage={hub.powerUsage} 
+            isOnline={hub.is_online} 
+          />
+        ))
+      )}
+
+      {/* Add Hub Form Modal */}
+      <AddSmartMeterForm 
+        isVisible={isModalVisible} 
+        onClose={closeModal} 
+        onHubAdded={handleHubAdded}  // Pass the callback to refresh the list
+      />
     </div>
   );
-}
+};
 
 export default Page;

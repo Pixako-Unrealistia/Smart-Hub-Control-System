@@ -24,6 +24,11 @@
 /auth-legacy/.next
 /auth-legacy/node_modules
 
+/smh-manager/.env.local
+/smh-manager/.env
+/smh-manager/.next
+/smh-manager/node_modules
+
 /mock_data/individuals
 /mock_data/halfhourly_dataset
 
