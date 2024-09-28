@@ -1,43 +1,43 @@
 "use client";
 import React, { useState } from 'react';
 import { EllipsisVertical } from 'lucide-react';
-import AddSmartMeterForm from './AddSmartMeterForm'; // Import the form component
-import AddMeterForm from './AddMeterForm';
+import AddMeterForm from './AddMeterForm'; // Import the form component for adding meters
+import { useRouter } from 'next/navigation';  // Import the useRouter hook
 
-interface DropdownMenuProps {
-  hubId: string; // Pass the hubId to delete the hub
+interface DropdownMenuMeterProps {
+  meterId: string; // Pass the meterId to delete the meter
+  hubId: string; // Pass the hubId to associate the meter with a hub
   onMeterAdded: () => void; // Callback to refresh the meters list after adding a new meter
-  onHubDeleted: () => void; // Callback to refresh the hubs list after deleting the hub
+  onMeterDeleted: () => void; // Callback to refresh the meters list after deleting the meter
 }
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubDeleted }) => {
+const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, onMeterAdded, onMeterDeleted }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const router = useRouter(); // Initialize the useRouter hook
 
   const toggleDropdown = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
 
-  const handleAdd = () => {
-    setIsModalVisible(true); // Show the modal when "Add Meter" is clicked
-    setIsDropdownVisible(false); // Hide the dropdown
-  };
-
-  const handleDeleteHub = async () => {
+  const handleDeleteMeter = async () => {
     try {
-      console.log('Deleting hub with ID:', hubId);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_METER_HUB}/api/hubs/${hubId}`, {
+      console.log('Deleting meter with ID:', meterId);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters/${meterId}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        console.log('Hub deleted successfully');
-        onHubDeleted(); // Call the callback to refresh the hubs list
+        console.log('Meter deleted successfully');
+        onMeterDeleted(); // Call the callback to refresh the meters list
+        
+        // Redirect back to the hub page or another relevant page after deletion
+        // router.push(`/smarthub/${hubId}`);  // Replace with the desired route after deletion
       } else {
-        console.error('Failed to delete hub');
+        console.error('Failed to delete meter');
       }
     } catch (error) {
-      console.error('Error deleting hub:', error);
+      console.error('Error deleting meter:', error);
     }
   };
 
@@ -65,23 +65,14 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubD
         >
           <button 
             className="w-full text-left px-4 py-2 hover:bg-gray-100" 
-            onClick={handleAdd}
+            onClick={handleDeleteMeter}
           >
-            Add Meter
-          </button>
-          <button 
-            className="w-full text-left px-4 py-2 hover:bg-gray-100" 
-            onClick={handleDeleteHub}
-          >
-            Remove Hub
+            Remove Meter
           </button>
         </div>
       </div>
-
-      {/* Modal for Adding a New Meter */}
-      <AddMeterForm isVisible={isModalVisible} onClose={closeModal} onMeterAdded={onMeterAdded} hubId={hubId} />
     </>
   );
 };
 
-export default DropdownMenu;
+export default DropdownMenuMeter;

@@ -8,7 +8,11 @@ const createHub = async (user_id: number, hub_name: string, location: string) =>
     );
     return result.rows[0];
   } catch (error) {
-    throw new Error(`Database error while creating hub: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Database error while creating hub: ${error.message}`);
+    } else {
+      throw new Error('Database error while creating hub: Unknown error');
+    }
   }
 };
 

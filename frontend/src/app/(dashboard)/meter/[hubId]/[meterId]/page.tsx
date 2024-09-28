@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';  // Import useParams to get the dynamic id
-
-import MeterCard from '../../../../components/MeterCard';
-import DropdownMenu from '../../../../components/DropdownMenu';
+import MeterCard from '../../../../../components/MeterCard';
+import DropdownMenuMeter from '../../../../../components/DropdownMenuMeter';
 
 const Page = () => {
   const [user, setUser] = useState(null);  // State for user info
+
   interface Meter {
     id: string;
     name: string;
@@ -18,11 +18,13 @@ const Page = () => {
 
   const [meters, setMeters] = useState<Meter[]>([]);  // State to hold meters
   const [loading, setLoading] = useState(true);  // Loading state
-  const { id } = useParams();  // Get the dynamic hub id from URL
-  const hubId = Array.isArray(id) ? id[0] : id;  // Ensure hubId is always a string
+  const { hubId: paramHubId, meterId: paramMeterId } = useParams();  // Get both hubId and meterId from URL
+
+  const hubId = Array.isArray(paramHubId) ? paramHubId[0] : paramHubId;  // Ensure hubId is always a string
+  const meterId = Array.isArray(paramMeterId) ? paramMeterId[0] : paramMeterId;  // Ensure meterId is always a string
 
   // Fetch meters for the specified hub
-  const fetchMetersForHub = async (hubId: string) => {
+  const fetchMetersForHub = async (hubId: string, meterId: string) => {
     try {
       // Fetch user data first
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
@@ -34,9 +36,9 @@ const Page = () => {
         const userData = await response.json();
         console.log('Fetched user data:', userData);
         setUser(userData);
-        
-        // Fetch meters for the hub with the id from the URL
-        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters/hub/${hubId}`, {
+
+        // Fetch meters for the hub with the hubId and meterId from the URL
+        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters/hub/${hubId}/meter/${meterId}`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -62,14 +64,14 @@ const Page = () => {
 
   // Fetch the user data and meters when the component mounts
   useEffect(() => {
-    if (hubId) {
-      console.log('Hub ID:', hubId);  // Log the hub ID to make sure it's being extracted
-      fetchMetersForHub(hubId);  // Fetch meters for the hub with the dynamic id
+    if (hubId && meterId) {
+      console.log('Hub ID:', hubId, 'Meter ID:', meterId);  // Log the hubId and meterId
+      fetchMetersForHub(hubId, meterId);  // Fetch meters for the hub and meterId with the dynamic ids
     } else {
-      console.log('No hub ID found in the URL.');
+      console.log('No hubId or meterId found in the URL.');
       setLoading(false);
     }
-  }, [hubId]);
+  }, [hubId, meterId]);
 
   if (loading) {
     return <h2>Loading...</h2>;  // Show loading state while fetching
@@ -81,37 +83,22 @@ const Page = () => {
 
   // Refresh the meters when a new meter is added
   const handleMeterAdded = () => {
-    fetchMetersForHub(hubId);  // Re-fetch the meters for this hub
+    fetchMetersForHub(hubId, meterId);  // Re-fetch the meters for this hub and meter
   };
 
   // Handle the hub deletion
   const handleHubDeleted = () => {
-    window.location.href = '/devices';  // Redirect to home or another page after hub is deleted
+    window.location.href = `/smarthub/${hubId}`;  // Redirect to the hub page after deletion
   };
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 p-10">
       <div className="flex justify-between items-center col-span-2 lg:col-span-4">
-        <h1 className="text-2xl">Meters in Hub {hubId}</h1>
-        <DropdownMenu hubId={hubId} onMeterAdded={handleMeterAdded} onHubDeleted={handleHubDeleted} />
+        <h1 className="text-2xl">Meters in Hub {hubId} (Meter {meterId})</h1>
+        <DropdownMenuMeter hubId={hubId} meterId={meterId} onMeterDeleted={handleHubDeleted} onMeterAdded={function (): void {
+          throw new Error('Function not implemented.');
+        } } />
       </div>
-
-      {/* Render fetched meters */}
-      {meters.length === 0 ? (
-        <h2>No meters available in this hub.</h2>
-      ) : (
-        meters.map((meter) => (
-          <MeterCard
-            key={meter.id}
-            hubid={hubId}
-            meterid={meter.id}
-            name={meter.name}
-            location={meter.location}
-            powerUsage={meter.powerUsage || 0}
-            isOnline={meter.state}
-          />
-        ))
-      )}
     </div>
   );
 };

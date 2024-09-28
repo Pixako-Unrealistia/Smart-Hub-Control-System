@@ -5,8 +5,14 @@ import StatusCard from '../../../components/StatusCard';
 import UsageCard from '../../../components/UsageCard';
 import { useRouter } from 'next/navigation';
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+}
+
 const Page = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {

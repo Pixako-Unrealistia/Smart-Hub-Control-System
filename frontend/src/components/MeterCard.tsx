@@ -3,14 +3,16 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Power, Zap, Server, Gauge } from "lucide-react";
 
-interface SmartHubCardProps {
-  id: string;
+interface MeterCardProps {
+  hubid: string;
+  meterid: string;
+  name: string;
   location: string;
   powerUsage: number;
   isOnline: boolean;
 }
 
-const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, location, powerUsage, isOnline }) => {
+const MeterCard: React.FC<MeterCardProps> = ({ hubid, meterid, name, location, powerUsage, isOnline }) => {
   const [showPowerIcon, setShowPowerIcon] = useState(false);
   const router = useRouter();
 
@@ -24,7 +26,7 @@ const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, location, powerUsage, i
 
   const handleCardClick = () => {
     // Redirect to the Smart Hub management page with the smart hub ID
-    router.push(`/smarthub/${id}`);
+    router.push(`/meter/${hubid}/${meterid}`);
   };
 
   return (
@@ -56,7 +58,7 @@ const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, location, powerUsage, i
       </div>
 
       {/* Title */}
-      <div className="text-lg font-semibold">Meter</div>
+      <div className="text-lg font-semibold">{name || "Smart Hub"}</div>
 
       {/* Location */}
       <div className={`text-sm ${isOnline ? "text-gray-600" : "text-gray-400"}`}>
@@ -77,4 +79,4 @@ const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, location, powerUsage, i
   );
 };
 
-export default SmartHubCard;
+export default MeterCard;

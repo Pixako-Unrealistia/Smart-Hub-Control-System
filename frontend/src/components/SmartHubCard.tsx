@@ -25,7 +25,7 @@ const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, name, location, powerUs
 
   const handleCardClick = () => {
     // Redirect to the Smart Hub management page with the smart hub ID
-    router.push(`/smarthub/${id}`);
+    router.push(`/smarthub/${id}/`);
   };
 
   return (

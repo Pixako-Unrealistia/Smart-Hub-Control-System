@@ -41,7 +41,6 @@ const menuItems = [
 const Menu = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check user status by fetching user data from the server
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {

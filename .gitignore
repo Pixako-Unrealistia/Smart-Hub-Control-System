@@ -29,6 +29,11 @@
 /smh-manager/.next
 /smh-manager/node_modules
 
+/meter-manager/.env.local
+/meter-manager/.env
+/meter-manager/.next
+/meter-manager/node_modules
+
 /mock_data/individuals
 /mock_data/halfhourly_dataset
 

@@ -12,7 +12,8 @@ export const addHub = async (req: Request, res: Response) => {
     logger.error('Error adding hub:', error);
 
     // Return the error message in the response
-    res.status(500).json({ message: 'Failed to add hub', error: error.message || error });
+    const err = error as Error;
+    res.status(500).json({ message: 'Failed to add hub', error: err.message || err });
   }
 };
 
@@ -26,7 +27,8 @@ export const getHubsForUser = async (req: Request, res: Response) => {
     res.status(200).json(hubs);
   } catch (error) {
     logger.error('Error fetching hubs for user:', error);
-    res.status(500).json({ message: 'Failed to fetch hubs', error: error.message || error });
+    const err = error as Error;
+    res.status(500).json({ message: 'Failed to fetch hubs', error: err.message || err });
   }
 };
 
@@ -44,7 +46,8 @@ export const updateHub = async (req: Request, res: Response) => {
     res.status(200).json(updatedHub);
   } catch (error) {
     logger.error('Error updating hub:', error);
-    res.status(500).json({ message: 'Failed to update hub', error: error.message || error });
+    const err = error as Error;
+    res.status(500).json({ message: 'Failed to update hub', error: err.message || err });
   }
 };
 
@@ -61,6 +64,7 @@ export const deleteHub = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Hub deleted successfully', deletedHub });
   } catch (error) {
     logger.error('Error deleting hub:', error);
-    res.status(500).json({ message: 'Failed to delete hub', error: error.message || error });
+    const err = error as Error;
+    res.status(500).json({ message: 'Failed to delete hub', error: err.message || err });
   }
 };

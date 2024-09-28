@@ -82,16 +82,6 @@ BEFORE UPDATE ON meter_data
 FOR EACH ROW
 EXECUTE PROCEDURE update_timestamp();
 
--- Adding the new smart_hubs table
-CREATE TABLE IF NOT EXISTS smart_hubs (
-    id SERIAL PRIMARY KEY,
-    hub_name VARCHAR(100),
-    location VARCHAR(255),
-    user_id INTEGER NOT NULL,  -- Foreign key for the user who owns the hub
-    is_online BOOLEAN DEFAULT false, -- Indicates whether the hub is online
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
 
 -- Add is_online to smart_meter_hubs if not already added
 ALTER TABLE smart_meter_hubs ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT false;

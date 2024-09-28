@@ -102,10 +102,12 @@ const Page = () => {
 
       {/* Add Hub Form Modal */}
       <AddSmartMeterForm 
-        isVisible={isModalVisible} 
-        onClose={closeModal} 
-        onHubAdded={handleHubAdded}  // Pass the callback to refresh the list
-      />
+        isVisible={isModalVisible}
+        onClose={closeModal}
+        onHubAdded={handleHubAdded} // Pass the callback to refresh the list
+        hubId={''} onMeterAdded={function (): void {
+          throw new Error('Function not implemented.');
+        } }      />
     </div>
   );
 };
