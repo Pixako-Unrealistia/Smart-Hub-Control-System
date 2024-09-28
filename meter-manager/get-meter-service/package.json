@@ -1,5 +1,5 @@
 {
-  "name": "smh-manager",
+  "name": "get-meter-service",
   "version": "1.0.0",
   "description": "Smart Meter Hub Management Service",
   "main": "src/app.ts",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@types/cors": "^2.8.17",
+    "@types/dotenv": "^8.2.0",
     "@types/express": "^5.0.0",
     "@types/pg": "^8.11.10",
     "cors": "^2.8.5",

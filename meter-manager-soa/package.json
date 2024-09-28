@@ -1,5 +1,5 @@
 {
-  "name": "smh-manager",
+  "name": "meter-manager",
   "version": "1.0.0",
   "description": "Smart Meter Hub Management Service",
   "main": "src/app.ts",

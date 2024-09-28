@@ -1,3 +1,4 @@
+//models/meterModel.ts
 import db from '../utils/db'; // Database connection utility
 
 // Create a new meter

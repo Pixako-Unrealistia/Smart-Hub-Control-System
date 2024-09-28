@@ -1,0 +1,8 @@
+packages:
+  - 'frontend'
+  - 'auth'
+  - 'smh-manager'
+  - 'meter-manager/create-meter-service'
+  - 'meter-manager/delete-meter-service'
+  - 'meter-manager/get-meter-service'
+  - 'meter-manager/update-meter-service'

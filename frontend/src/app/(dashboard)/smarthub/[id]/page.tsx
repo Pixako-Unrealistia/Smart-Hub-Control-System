@@ -36,7 +36,7 @@ const Page = () => {
         setUser(userData);
         
         // Fetch meters for the hub with the id from the URL
-        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters/hub/${hubId}`, {
+        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_METER_SERVICE_URL}/api/meters/hub/${hubId}`, {
           method: 'GET',
           credentials: 'include',
         });

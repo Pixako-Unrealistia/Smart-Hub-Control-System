@@ -1,3 +1,4 @@
+//services/meterService.ts
 import { createMeter, getMetersByHubId, updateMeter, deleteMeter } from '../models/meterModel';
 
 export const createMeterService = async (meterData: { hub_id: any; meter_id: any; name: any; location: any; state: any; }) => {

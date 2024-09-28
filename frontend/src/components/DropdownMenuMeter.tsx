@@ -23,7 +23,7 @@ const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, o
   const handleDeleteMeter = async () => {
     try {
       console.log('Deleting meter with ID:', meterId);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters/${meterId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_DELETE_METER_SERVICE_URL}/api/meters/${meterId}`, {
         method: 'DELETE',
       });
 

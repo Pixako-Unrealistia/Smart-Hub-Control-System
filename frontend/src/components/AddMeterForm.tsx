@@ -31,7 +31,7 @@ const AddMeterForm: React.FC<AddMeterFormProps> = ({ isVisible, hubId, onClose, 
 
     try {
       // API call to add a new meter to the specified hub
-      const response = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_CREATE_METER_SERVICE_URL}/api/meters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

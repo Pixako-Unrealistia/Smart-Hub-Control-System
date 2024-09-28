@@ -1,3 +1,4 @@
+//controller/meterController.ts
 import { Request, Response } from 'express';
 import { createMeter, getMetersByHubId, updateMeter, deleteMeter } from '../services/meterService';
 
