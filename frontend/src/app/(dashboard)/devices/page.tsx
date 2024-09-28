@@ -26,8 +26,8 @@ const Page = () => {
         console.log('Fetched user data:', userData);  
         setUser(userData);  
        
-        console.log('NEXT_METER_HUB:', process.env.NEXT_PUBLIC_METER_HUB);
-        const hubsResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_HUB}/api/hubs/user/${userData.id}`, {
+        console.log('NEXT_METER_HUB:', process.env.NEXT_PUBLIC_GET_HUB_SERVICE_URL);
+        const hubsResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_HUB_SERVICE_URL}/api/hubs/user/${userData.id}`, {
           method: 'GET',
           credentials: 'include',
         });

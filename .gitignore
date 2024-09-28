@@ -39,6 +39,11 @@
 /meter-manager/get-meter-service/node_modules
 /meter-manager/update-meter-service/node_modules
 
+/smh-manager/create-hub-service/node_modules
+/smh-manager/delete-hub-service/node_modules
+/smh-manager/get-hub-service/node_modules
+/smh-manager/update-hub-service/node_modules
+
 /meter-manager-soa/.env.local
 /meter-manager-soa/.env
 /meter-manager-soa/.next

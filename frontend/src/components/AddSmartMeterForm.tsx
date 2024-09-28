@@ -32,7 +32,7 @@ const AddSmartMeterForm: React.FC<AddSmartMeterFormProps> = ({ isVisible, onClos
     setError('');  // Clear any previous errors
   
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_METER_HUB}/api/hubs`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_CREATE_HUB_SERVICE_URL}/api/hubs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

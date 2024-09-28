@@ -26,7 +26,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubD
   const handleDeleteHub = async () => {
     try {
       console.log('Deleting hub with ID:', hubId);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_METER_HUB}/api/hubs/${hubId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_DELETE_HUB_SERVICE_URL}/api/hubs/${hubId}`, {
         method: 'DELETE',
       });
 
