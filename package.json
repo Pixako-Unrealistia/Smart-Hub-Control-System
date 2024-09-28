@@ -2,10 +2,9 @@
 	"name": "smart-hub-control-system",
 	"version": "1.0.0",
 	"scripts": {
-	  "dev": "concurrently \"pnpm --filter frontend run dev\" \"pnpm --filter auth run dev\" \"pnpm --filter create-hub-service run dev\" \"pnpm --filter get-hub-service run dev\" \"pnpm --filter update-hub-service run dev\" \"pnpm --filter delete-hub-service run dev\" \"pnpm --filter create-meter-service run dev\" \"pnpm --filter get-meter-service run dev\" \"pnpm --filter update-meter-service run dev\" \"pnpm --filter delete-meter-service run dev\""
+	  "dev": "concurrently \"pnpm --filter frontend run dev\" \"pnpm --filter auth run dev\" \"pnpm --filter create-hub-service run dev\" \"pnpm --filter get-hub-service run dev\" \"pnpm --filter update-hub-service run dev\" \"pnpm --filter delete-hub-service run dev\" \"pnpm --filter create-meter-service run dev\" \"pnpm --filter get-meter-service run dev\" \"pnpm --filter update-meter-service run dev\" \"pnpm --filter delete-meter-service run dev\" \"pnpm --filter set-all-meters-by-hub-id-service run dev\" \"pnpm --filter set-meter-by-id-service run dev\""
 	},
 	"devDependencies": {
 	  "concurrently": "^7.0.0"
 	}
-  }
-  
+}

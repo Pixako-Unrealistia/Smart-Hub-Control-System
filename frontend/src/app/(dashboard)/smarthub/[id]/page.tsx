@@ -5,10 +5,17 @@ import { useParams, useRouter } from 'next/navigation';  // Import useParams to 
 
 import MeterCard from '../../../../components/MeterCard';
 import DropdownMenu from '../../../../components/DropdownMenu';
+import { Power } from 'lucide-react';
 
 const Page = () => {
   const router = useRouter(); 
   const [user, setUser] = useState(null);  // State for user info
+  const [allMetersOn, setAllMetersOn] = useState(false); // State to track if all meters are on/off
+  const [meters, setMeters] = useState<Meter[]>([]);  // State to hold meters
+  const [loading, setLoading] = useState(true);  // Loading state
+  const { id } = useParams();  // Get the dynamic hub id from URL
+  const hubId = Array.isArray(id) ? id[0] : id;  // Ensure hubId is always a string
+
   interface Meter {
     id: string;
     name: string;
@@ -17,15 +24,9 @@ const Page = () => {
     state: boolean;
   }
 
-  const [meters, setMeters] = useState<Meter[]>([]);  // State to hold meters
-  const [loading, setLoading] = useState(true);  // Loading state
-  const { id } = useParams();  // Get the dynamic hub id from URL
-  const hubId = Array.isArray(id) ? id[0] : id;  // Ensure hubId is always a string
-
   // Fetch meters for the specified hub
   const fetchMetersForHub = async (hubId: string) => {
     try {
-      // Fetch user data first
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
         method: 'GET',
         credentials: 'include',
@@ -33,7 +34,6 @@ const Page = () => {
 
       if (response.ok) {
         const userData = await response.json();
-        console.log('Fetched user data:', userData);
         setUser(userData);
         
         // Fetch meters for the hub with the id from the URL
@@ -44,31 +44,81 @@ const Page = () => {
 
         if (metersResponse.ok) {
           const metersData = await metersResponse.json();
-          console.log('Fetched meters:', metersData);
           setMeters(metersData);  // Set fetched meters to state
-          setLoading(false);  // Set loading to false after data is fetched
+          setAllMetersOn(metersData.every((meter: { state: any; }) => meter.state));  // Check if all meters are on
         } else {
           console.error('Failed to fetch meters');
-          setLoading(false);
         }
       } else {
         console.log('Invalid token or response issue, redirecting to sign-in');
-        setLoading(false);
       }
     } catch (error) {
       console.error('Error fetching meters or user data:', error);
-      setLoading(false);
+    } finally {
+      setLoading(false); // Ensure loading state is stopped
+    }
+  };
+
+  // Toggle all meters on/off
+  const toggleAllMeters = async () => {
+    try {
+      const newState = !allMetersOn; // Toggle the current state
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SET_ALL_METERS_STATE_URL}/api/hubs/${hubId}/meters`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ state: newState }), // Pass the new state to toggle all meters
+      });
+
+      if (response.ok) {
+        // Update the local meters state without needing to re-fetch
+        const updatedMeters = meters.map(meter => ({
+          ...meter,
+          state: newState, // Set all meters' state to the new state
+        }));
+        setMeters(updatedMeters);  // Immediately reflect the changes in the UI
+        setAllMetersOn(newState); // Update the UI to reflect the new state
+      } else {
+        console.error('Failed to toggle all meters.');
+      }
+    } catch (error) {
+      console.error('Error toggling all meters:', error);
+    }
+  };
+
+  // Toggle individual meter on/off
+  const toggleMeter = async (meterId: string) => {
+    try {
+      const meter = meters.find(m => m.id === meterId);
+      const newState = !meter?.state; // Toggle the meter's state
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SET_METER_STATE_URL}/api/meters/${meterId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ state: newState }), // Pass the new state to toggle the meter
+      });
+
+      if (response.ok) {
+        // Update the state for this meter in the meters array
+        setMeters(prevMeters =>
+          prevMeters.map(meter =>
+            meter.id === meterId ? { ...meter, state: newState } : meter
+          )
+        );
+      } else {
+        console.error('Failed to toggle meter state.');
+      }
+    } catch (error) {
+      console.error('Error toggling meter state:', error);
     }
   };
 
   // Fetch the user data and meters when the component mounts
   useEffect(() => {
     if (hubId) {
-      console.log('Hub ID:', hubId);  // Log the hub ID to make sure it's being extracted
       fetchMetersForHub(hubId);  // Fetch meters for the hub with the dynamic id
-    } else {
-      console.log('No hub ID found in the URL.');
-      setLoading(false);
     }
   }, [hubId]);
 
@@ -87,7 +137,6 @@ const Page = () => {
 
   // Handle the hub deletion
   const handleHubDeleted = () => {
-    // window.location.href = '/devices'; 
     router.push('/devices');  // Redirect to the devices page after deleting the hub
   };
 
@@ -95,7 +144,13 @@ const Page = () => {
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 p-10">
       <div className="flex justify-between items-center col-span-2 lg:col-span-4">
         <h1 className="text-2xl">Meters in Hub {hubId}</h1>
-        <DropdownMenu hubId={hubId} onMeterAdded={handleMeterAdded} onHubDeleted={handleHubDeleted} />
+        <div className='grid grid-cols-2 gap-10'>
+          < Power 
+            className={`w-6 h-6 cursor-pointer ${allMetersOn ? 'text-green-600' : 'text-red-600'}`}
+            onClick={toggleAllMeters} // Toggle all meters on/off
+          />
+          <DropdownMenu hubId={hubId} onMeterAdded={handleMeterAdded} onHubDeleted={handleHubDeleted} />
+        </div>
       </div>
 
       {/* Render fetched meters */}
@@ -111,6 +166,7 @@ const Page = () => {
             location={meter.location}
             powerUsage={meter.powerUsage || 0}
             isOnline={meter.state}
+            toggleMeter={toggleMeter}  // Pass the toggle function to each MeterCard
           />
         ))
       )}
