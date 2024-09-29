@@ -1,20 +1,16 @@
 "use client";
 import React, { useState } from 'react';
 import { EllipsisVertical } from 'lucide-react';
-import AddMeterForm from './AddMeterForm'; // Import the form component for adding meters
-import { useRouter } from 'next/navigation';  // Import the useRouter hook
 
 interface DropdownMenuMeterProps {
   meterId: string; // Pass the meterId to delete the meter
   hubId: string; // Pass the hubId to associate the meter with a hub
-  onMeterAdded: () => void; // Callback to refresh the meters list after adding a new meter
   onMeterDeleted: () => void; // Callback to refresh the meters list after deleting the meter
 }
 
-const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, onMeterAdded, onMeterDeleted }) => {
+const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, onMeterDeleted }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const router = useRouter(); // Initialize the useRouter hook
+  const [isDeleting, setIsDeleting] = useState(false); // Track deletion state
 
   const toggleDropdown = () => {
     setIsDropdownVisible(!isDropdownVisible);
@@ -22,6 +18,7 @@ const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, o
 
   const handleDeleteMeter = async () => {
     try {
+      setIsDeleting(true); // Set deleting state
       console.log('Deleting meter with ID:', meterId);
       const response = await fetch(`${process.env.NEXT_PUBLIC_DELETE_METER_SERVICE_URL}/api/meters/${meterId}`, {
         method: 'DELETE',
@@ -30,19 +27,14 @@ const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, o
       if (response.ok) {
         console.log('Meter deleted successfully');
         onMeterDeleted(); // Call the callback to refresh the meters list
-        
-        // Redirect back to the hub page or another relevant page after deletion
-        // router.push(`/smarthub/${hubId}`);  // Replace with the desired route after deletion
       } else {
         console.error('Failed to delete meter');
       }
     } catch (error) {
       console.error('Error deleting meter:', error);
+    } finally {
+      setIsDeleting(false); // Reset deleting state
     }
-  };
-
-  const closeModal = () => {
-    setIsModalVisible(false); // Close the modal
   };
 
   return (
@@ -66,8 +58,9 @@ const DropdownMenuMeter: React.FC<DropdownMenuMeterProps> = ({ meterId, hubId, o
           <button 
             className="w-full text-left px-4 py-2 hover:bg-gray-100" 
             onClick={handleDeleteMeter}
+            disabled={isDeleting} // Disable the button while deleting
           >
-            Remove Meter
+            {isDeleting ? 'Deleting...' : 'Remove Meter'}
           </button>
         </div>
       </div>

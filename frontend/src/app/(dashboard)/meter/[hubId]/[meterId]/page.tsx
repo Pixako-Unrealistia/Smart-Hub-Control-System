@@ -1,103 +1,88 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';  // Import useParams to get the dynamic id
-import MeterCard from '../../../../../components/MeterCard';
+import { useParams } from 'next/navigation';
 import DropdownMenuMeter from '../../../../../components/DropdownMenuMeter';
 
 const Page = () => {
-  const [user, setUser] = useState(null);  // State for user info
-
-  interface Meter {
-    id: string;
-    name: string;
-    location: string;
-    powerUsage?: number;
-    state: boolean;
-  }
-
-  const [meters, setMeters] = useState<Meter[]>([]);  // State to hold meters
+  const [config, setConfig] = useState<any | null>(null);  // State to hold the meter config
   const [loading, setLoading] = useState(true);  // Loading state
-  const { hubId: paramHubId, meterId: paramMeterId } = useParams();  // Get both hubId and meterId from URL
+  const { meterId: paramMeterId, hubId: paramHubId } = useParams();  // Get both hubId and meterId from URL
 
-  const hubId = Array.isArray(paramHubId) ? paramHubId[0] : paramHubId;  // Ensure hubId is always a string
-  const meterId = Array.isArray(paramMeterId) ? paramMeterId[0] : paramMeterId;  // Ensure meterId is always a string
+  const meterId = Array.isArray(paramMeterId) ? paramMeterId[0] : paramMeterId;
+  const hubId = Array.isArray(paramHubId) ? paramHubId[0] : paramHubId;
 
-  // Fetch meters for the specified hub
-  const fetchMetersForHub = async (hubId: string, meterId: string) => {
+  const fetchMeterConfig = async (meterId: string) => {
     try {
-      // Fetch user data first
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const configResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_CONFIG_SERVICE_URL}/api/configs/${meterId}`, {
         method: 'GET',
         credentials: 'include',
       });
 
-      if (response.ok) {
-        const userData = await response.json();
-        console.log('Fetched user data:', userData);
-        setUser(userData);
-
-        // Fetch meters for the hub with the hubId and meterId from the URL
-        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_MANAGER}/api/meters/hub/${hubId}/meter/${meterId}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (metersResponse.ok) {
-          const metersData = await metersResponse.json();
-          console.log('Fetched meters:', metersData);
-          setMeters(metersData);  // Set fetched meters to state
-          setLoading(false);  // Set loading to false after data is fetched
+      if (configResponse.ok) {
+        const configData = await configResponse.json();
+        if (Array.isArray(configData) && configData.length > 0) {
+          setConfig(configData[0]);
         } else {
-          console.error('Failed to fetch meters');
-          setLoading(false);
+          setConfig(null);
         }
       } else {
-        console.log('Invalid token or response issue, redirecting to sign-in');
-        setLoading(false);
+        console.error('Failed to fetch meter config');
       }
     } catch (error) {
-      console.error('Error fetching meters or user data:', error);
+      console.error('Error fetching meter config:', error);
+    } finally {
       setLoading(false);
     }
   };
 
-  // Fetch the user data and meters when the component mounts
   useEffect(() => {
-    if (hubId && meterId) {
-      console.log('Hub ID:', hubId, 'Meter ID:', meterId);  // Log the hubId and meterId
-      fetchMetersForHub(hubId, meterId);  // Fetch meters for the hub and meterId with the dynamic ids
+    if (meterId) {
+      fetchMeterConfig(meterId);
     } else {
-      console.log('No hubId or meterId found in the URL.');
       setLoading(false);
     }
-  }, [hubId, meterId]);
+  }, [meterId]);
 
-  if (loading) {
-    return <h2>Loading...</h2>;  // Show loading state while fetching
-  }
-
-  if (!user) {
-    return <h2>Loading user data...</h2>;  // Loading state for user data
-  }
-
-  // Refresh the meters when a new meter is added
-  const handleMeterAdded = () => {
-    fetchMetersForHub(hubId, meterId);  // Re-fetch the meters for this hub and meter
-  };
-
-  // Handle the hub deletion
-  const handleHubDeleted = () => {
+  const handleMeterDeleted = () => {
     window.location.href = `/smarthub/${hubId}`;  // Redirect to the hub page after deletion
   };
 
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 p-10">
-      <div className="flex justify-between items-center col-span-2 lg:col-span-4">
-        <h1 className="text-2xl">Meters in Hub {hubId} (Meter {meterId})</h1>
-        <DropdownMenuMeter hubId={hubId} meterId={meterId} onMeterDeleted={handleHubDeleted} onMeterAdded={function (): void {
-          throw new Error('Function not implemented.');
-        } } />
+    <div className="grid grid-cols-2 p-10">
+      <div className='flex col-span-2 justify-between'>
+        <h1 className="text-2xl mb-4">Meter Config for Meter {meterId} from Hub {hubId}</h1>
+        <DropdownMenuMeter hubId={hubId} meterId={meterId} onMeterDeleted={handleMeterDeleted} />
+      </div>
+
+      {/* Config display */}
+      <div className="border p-5 rounded-lg bg-white shadow-md">
+        {config ? (
+          <div className="space-y-4">
+            <div className="bg-gray-100 p-4 rounded-md shadow-md">
+              <h2 className="text-lg font-bold mb-2">Meter ID</h2>
+              <p>{config.meter_id || 'N/A'}</p>
+            </div>
+
+            <div className="bg-gray-100 p-4 rounded-md shadow-md">
+              <h2 className="text-lg font-bold mb-2">Configuration</h2>
+              <p><strong>Max Voltage:</strong> {config.config?.max_voltage || 'N/A'}</p>
+              <p><strong>Firmware Version:</strong> {config.config?.firmware_version || 'N/A'}</p>
+            </div>
+
+            <div className="bg-gray-100 p-4 rounded-md shadow-md">
+              <h2 className="text-lg font-bold mb-2">Timestamps</h2>
+              <p><strong>Created At:</strong> {new Date(config.created_at).toLocaleString()}</p>
+              <p><strong>Updated At:</strong> {new Date(config.updated_at).toLocaleString()}</p>
+            </div>
+          </div>
+        ) : (
+          <p>No config available for this meter.</p>
+        )}
       </div>
     </div>
   );

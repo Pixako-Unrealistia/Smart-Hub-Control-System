@@ -23,14 +23,10 @@ const Page = () => {
         credentials: 'include',  
       });
 
-      console.log('API response:', response);  
-
       if (response.ok) {
         const userData = await response.json();
-        console.log('Fetched user data:', userData);  
         setUser(userData);  
        
-        console.log('NEXT_METER_HUB:', process.env.NEXT_PUBLIC_GET_HUB_SERVICE_URL);
         const hubsResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_HUB_SERVICE_URL}/api/hubs/user/${userData.id}`, {
           method: 'GET',
           credentials: 'include',
@@ -38,7 +34,11 @@ const Page = () => {
 
         if (hubsResponse.ok) {
           const hubsData = await hubsResponse.json();
-          setHubs(hubsData); 
+
+          // Sort the hubs so that online ones appear first
+          const sortedHubs = hubsData.sort((a: any, b: any) => (b.is_online ? 1 : 0) - (a.is_online ? 1 : 0));
+
+          setHubs(sortedHubs); // Set the sorted hubs
         } else {
           console.error('Failed to fetch smart hubs');
         }

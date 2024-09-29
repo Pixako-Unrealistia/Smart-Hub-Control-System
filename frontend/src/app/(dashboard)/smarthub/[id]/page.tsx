@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';  // Import useParams to get the dynamic id
-
+import { useParams, useRouter } from 'next/navigation';
 import MeterCard from '../../../../components/MeterCard';
 import DropdownMenu from '../../../../components/DropdownMenu';
 import { Power } from 'lucide-react';
 
 const Page = () => {
-  const router = useRouter(); 
+  const router = useRouter();
   const [user, setUser] = useState(null);  // State for user info
   const [allMetersOn, setAllMetersOn] = useState(false); // State to track if all meters are on/off
   const [meters, setMeters] = useState<Meter[]>([]);  // State to hold meters
@@ -17,11 +16,13 @@ const Page = () => {
   const hubId = Array.isArray(id) ? id[0] : id;  // Ensure hubId is always a string
 
   interface Meter {
-    id: string;
+    id: string;  // Primary key (for on/off operations)
+    meter_id: string;  // Meter identifier (for fetching usage)
     name: string;
     location: string;
     powerUsage?: number;
     state: boolean;
+    readIndex: number;  // Add readIndex to track the current reading index
   }
 
   // Fetch meters for the specified hub
@@ -35,7 +36,7 @@ const Page = () => {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
-        
+
         // Fetch meters for the hub with the id from the URL
         const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_METER_SERVICE_URL}/api/meters/hub/${hubId}`, {
           method: 'GET',
@@ -44,8 +45,13 @@ const Page = () => {
 
         if (metersResponse.ok) {
           const metersData = await metersResponse.json();
-          setMeters(metersData);  // Set fetched meters to state
-          setAllMetersOn(metersData.every((meter: { state: any; }) => meter.state));  // Check if all meters are on
+          const initializedMeters = metersData.map((meter: Meter) => ({
+            ...meter,
+            readIndex: 0,  // Initialize the readIndex for each meter
+          }));
+
+          setMeters(initializedMeters);  // Set fetched meters to state
+          setAllMetersOn(metersData.every((meter: { state: any }) => meter.state));  // Check if all meters are on
         } else {
           console.error('Failed to fetch meters');
         }
@@ -87,7 +93,7 @@ const Page = () => {
     }
   };
 
-  // Toggle individual meter on/off
+  // Toggle individual meter on/off using the primary key (id)
   const toggleMeter = async (meterId: string) => {
     try {
       const meter = meters.find(m => m.id === meterId);
@@ -115,6 +121,60 @@ const Page = () => {
     }
   };
 
+  // Function to fetch and update real-time meter value based on the readIndex (using meter_id)
+// Function to fetch and update real-time meter value based on the readIndex (using meter_id)
+const fetchMeterReading = async (meterId: string, index: number) => {
+  try {
+    const response = await fetch(`http://localhost:8002/meter/${meterId}/read/${index}`, {
+      method: 'GET',
+    });
+
+    if (response.ok) {
+      const meterData = await response.json();
+      // Extract the energy(kWh/hh) value, remove any spaces, and convert it to a number
+      const powerUsage = parseFloat(meterData["energy(kWh/hh)"].trim());
+
+      if (!isNaN(powerUsage)) {
+        return powerUsage; // Return the parsed power usage
+      } else {
+        console.error('Invalid power usage data');
+        return null;
+      }
+    } else {
+      console.error('Failed to fetch meter reading');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching meter reading:', error);
+    return null;
+  }
+};
+
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const updatedMeters = await Promise.all(
+        meters.map(async (meter) => {
+          if (meter.state) {
+            const reading = await fetchMeterReading(meter.meter_id, meter.readIndex);  // Fetch meter reading using meter_id
+            if (reading !== null) {
+              // Return a new meter object instead of mutating the current one
+              return {
+                ...meter,
+                powerUsage: reading, // Update the power usage
+                readIndex: meter.readIndex + 1, // Increment the readIndex
+              };
+            }
+          }
+          return meter;
+        })
+      );
+      setMeters([...updatedMeters]);  // Update state with a new array
+    }, 1000); // Fetch the reading every second
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [meters]);  // Make sure meters are part of the dependency array
+
   // Fetch the user data and meters when the component mounts
   useEffect(() => {
     if (hubId) {
@@ -135,6 +195,11 @@ const Page = () => {
     fetchMetersForHub(hubId);  // Re-fetch the meters for this hub
   };
 
+  // Refresh the meters when a hub is updated
+  const handleHubUpdated = () => {
+    fetchMetersForHub(hubId); // Re-fetch the meters after updating the hub
+  };
+
   // Handle the hub deletion
   const handleHubDeleted = () => {
     router.push('/devices');  // Redirect to the devices page after deleting the hub
@@ -145,11 +210,16 @@ const Page = () => {
       <div className="flex justify-between items-center col-span-2 lg:col-span-4">
         <h1 className="text-2xl">Meters in Hub {hubId}</h1>
         <div className='grid grid-cols-2 gap-10'>
-          < Power 
+          <Power 
             className={`w-6 h-6 cursor-pointer ${allMetersOn ? 'text-green-600' : 'text-red-600'}`}
             onClick={toggleAllMeters} // Toggle all meters on/off
           />
-          <DropdownMenu hubId={hubId} onMeterAdded={handleMeterAdded} onHubDeleted={handleHubDeleted} />
+          <DropdownMenu 
+            hubId={hubId} 
+            onMeterAdded={handleMeterAdded} 
+            onHubDeleted={handleHubDeleted} 
+            onHubUpdated={handleHubUpdated}  // Callback to refresh the hub list after updating
+          />
         </div>
       </div>
 
@@ -159,9 +229,9 @@ const Page = () => {
       ) : (
         meters.map((meter) => (
           <MeterCard
-            key={meter.id}
+            key={meter.id}  // Use id as the key
             hubid={hubId}
-            meterid={meter.id}
+            meterid={meter.id}  // Use id for internal operations like on/off
             name={meter.name}
             location={meter.location}
             powerUsage={meter.powerUsage || 0}

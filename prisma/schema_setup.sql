@@ -46,11 +46,12 @@ CREATE TABLE IF NOT EXISTS meter_data (
 -- Create the meter_config table (Optional)
 CREATE TABLE IF NOT EXISTS meter_config (
     id SERIAL PRIMARY KEY,
-    meter_id INTEGER REFERENCES meters(id) ON DELETE CASCADE,
+    meter_id INTEGER REFERENCES meters(id) ON DELETE CASCADE UNIQUE,  -- Ensure each meter_id has only one config
     config JSONB,  -- Configuration data in JSON format
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Function to auto-update the updated_at column
 CREATE OR REPLACE FUNCTION update_timestamp()
@@ -82,6 +83,16 @@ BEFORE UPDATE ON meter_data
 FOR EACH ROW
 EXECUTE PROCEDURE update_timestamp();
 
+-- Trigger to auto-update the updated_at column when a config is updated
+CREATE TRIGGER update_meter_config_timestamp
+BEFORE UPDATE ON meter_config
+FOR EACH ROW
+EXECUTE PROCEDURE update_timestamp();
+
 
 -- Add is_online to smart_meter_hubs if not already added
 ALTER TABLE smart_meter_hubs ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT false;
+
+-- Add unique constraint on meter_id to ensure one config per meter
+ALTER TABLE meter_config
+ADD CONSTRAINT unique_meter_id_config UNIQUE (meter_id);

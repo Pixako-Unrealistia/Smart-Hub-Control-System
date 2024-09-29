@@ -10,5 +10,11 @@ packages:
   - 'smh-manager/delete-hub-service'
   - 'smh-manager/get-hub-service'
   - 'smh-manager/update-hub-service'
-  - 'meter-setter/set-all-meters-by-hub-id-service'
-  - 'meter-setter/set-meter-by-id-service'
+  - 'user-management/set-all-meters-by-hub-id-service'
+  - 'user-management/set-meter-by-id-service'
+  - 'user-management/set-hub-status-service'
+  - 'meter-setter/create-config'
+  - 'meter-setter/delete-config'
+  - 'meter-setter/get-config'
+  - 'meter-setter/update-config'
+  

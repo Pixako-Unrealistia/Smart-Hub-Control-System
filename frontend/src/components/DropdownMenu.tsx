@@ -1,37 +1,44 @@
-"use client";
+'use client';
+
 import React, { useState } from 'react';
 import { EllipsisVertical } from 'lucide-react';
 import AddSmartMeterForm from './AddSmartMeterForm'; // Import the form component
 import AddMeterForm from './AddMeterForm';
+import EditHubForm from '../components/EditHubForm';
 
 interface DropdownMenuProps {
   hubId: string; // Pass the hubId to delete the hub
   onMeterAdded: () => void; // Callback to refresh the meters list after adding a new meter
   onHubDeleted: () => void; // Callback to refresh the hubs list after deleting the hub
+  onHubUpdated: () => void; // Callback to refresh the hubs list after editing the hub
 }
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubDeleted }) => {
+const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubDeleted, onHubUpdated }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For Edit Hub modal
 
   const toggleDropdown = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
 
   const handleAdd = () => {
-    setIsModalVisible(true); // Show the modal when "Add Meter" is clicked
+    setIsAddModalVisible(true); // Show the modal when "Add Meter" is clicked
+    setIsDropdownVisible(false); // Hide the dropdown
+  };
+
+  const handleEdit = () => {
+    setIsEditModalVisible(true); // Show the modal when "Edit Hub" is clicked
     setIsDropdownVisible(false); // Hide the dropdown
   };
 
   const handleDeleteHub = async () => {
     try {
-      console.log('Deleting hub with ID:', hubId);
       const response = await fetch(`${process.env.NEXT_PUBLIC_DELETE_HUB_SERVICE_URL}/api/hubs/${hubId}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        console.log('Hub deleted successfully');
         onHubDeleted(); // Call the callback to refresh the hubs list
       } else {
         console.error('Failed to delete hub');
@@ -41,8 +48,12 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubD
     }
   };
 
-  const closeModal = () => {
-    setIsModalVisible(false); // Close the modal
+  const closeAddModal = () => {
+    setIsAddModalVisible(false); // Close the add meter modal
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalVisible(false); // Close the edit hub modal
   };
 
   return (
@@ -68,7 +79,21 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubD
             onClick={handleAdd}
           >
             Add Meter
+          </button>          
+          <button 
+            className="w-full text-left px-4 py-2 hover:bg-gray-100" 
+            onClick={handleEdit}
+          >
+            Edit Hub
           </button>
+
+          <button 
+            className="w-full text-left px-4 py-2 hover:bg-gray-100" 
+            onClick={handleEdit}
+          >
+            Send Configuration
+          </button>
+
           <button 
             className="w-full text-left px-4 py-2 hover:bg-gray-100" 
             onClick={handleDeleteHub}
@@ -79,7 +104,10 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ hubId, onMeterAdded, onHubD
       </div>
 
       {/* Modal for Adding a New Meter */}
-      <AddMeterForm isVisible={isModalVisible} onClose={closeModal} onMeterAdded={onMeterAdded} hubId={hubId} />
+      <AddMeterForm isVisible={isAddModalVisible} onClose={closeAddModal} onMeterAdded={onMeterAdded} hubId={hubId} />
+
+      {/* Modal for Editing the Hub */}
+      <EditHubForm isVisible={isEditModalVisible} onClose={closeEditModal} onHubUpdated={onHubUpdated} hubId={hubId} />
     </>
   );
 };
