@@ -12,6 +12,7 @@ to run u need to
 -create foler 
 mock_data/halfhourly_dataset  <--- put the cloned dataset in there
 mock_data/individuals
+-pip install all the libraries needed (i cant remember lol)
 
 run the meter.py (located in mock_data/meter.py) <--- this will separate halfhourly_dataset into smaller csv files
 when running
