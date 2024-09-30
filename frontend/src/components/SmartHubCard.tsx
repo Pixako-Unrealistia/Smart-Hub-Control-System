@@ -46,7 +46,7 @@ const SmartHubCard: React.FC<SmartHubCardProps> = ({ id, name, location, powerUs
 
     const fetchPowerUsage = async () => {
       try {
-        const response = await fetch(`http://localhost:8003/api/hub-usage/${id}/${currentSecond}`); // Use currentSecond in the URL
+        const response = await fetch(`${process.env.NEXT_PUBLIC_GET_HUB_METER_USAGE_SERVICE_URL}/api/hub-usage/${id}/${currentSecond}`); // Use currentSecond in the URL
         if (response.ok) {
           const data = await response.json();
           setCurrentPowerUsage(data.total_power_usage); // Use total_power_usage from the response

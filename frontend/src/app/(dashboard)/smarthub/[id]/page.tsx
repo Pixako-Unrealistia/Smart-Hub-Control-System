@@ -123,7 +123,7 @@ const Page = () => {
 
 const fetchMeterReading = async (meterId: string, index: number) => {
   try {
-    const response = await fetch(`http://localhost:8002/meter/${meterId}/read/${index}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_GET_METER_USAGE_SERVICE_URL}/meter/${meterId}/read/${index}`, {
       method: 'GET',
     });
 
