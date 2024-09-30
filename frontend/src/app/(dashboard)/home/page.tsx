@@ -127,7 +127,7 @@ const Page = () => {
       <StatusCard value={onlineMeters} type='meter' />
       <div className='col-span-2'>
 
-        <UsageCard usage={totalUsage} unit="kWh/h" />
+        <UsageCard usage={totalUsage} unit="kWh/hh" />
       </div>
     </div>
   );
