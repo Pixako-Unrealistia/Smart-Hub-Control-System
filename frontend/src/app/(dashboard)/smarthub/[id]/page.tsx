@@ -121,8 +121,6 @@ const Page = () => {
     }
   };
 
-  // Function to fetch and update real-time meter value based on the readIndex (using meter_id)
-// Function to fetch and update real-time meter value based on the readIndex (using meter_id)
 const fetchMeterReading = async (meterId: string, index: number) => {
   try {
     const response = await fetch(`http://localhost:8002/meter/${meterId}/read/${index}`, {
@@ -131,11 +129,11 @@ const fetchMeterReading = async (meterId: string, index: number) => {
 
     if (response.ok) {
       const meterData = await response.json();
-      // Extract the energy(kWh/hh) value, remove any spaces, and convert it to a number
+
       const powerUsage = parseFloat(meterData["energy(kWh/hh)"].trim());
 
       if (!isNaN(powerUsage)) {
-        return powerUsage; // Return the parsed power usage
+        return powerUsage; 
       } else {
         console.error('Invalid power usage data');
         return null;

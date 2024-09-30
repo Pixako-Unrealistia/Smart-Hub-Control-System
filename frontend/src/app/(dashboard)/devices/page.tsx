@@ -2,9 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CirclePlus } from 'lucide-react';  // Import the CirclePlus icon
+import { CirclePlus } from 'lucide-react';
 import SmartHubCard from '../../../components/SmartHubCard';
-import AddSmartMeterForm from '../../../components/AddSmartMeterForm'; // Import the AddSmartMeterForm component
+import AddSmartMeterForm from '../../../components/AddSmartMeterForm';
+
+interface Hub {
+  id: string;
+  hub_name: string;
+  location: string;
+  powerUsage: number;
+  is_online: boolean;
+}
 
 const Page = () => {
   interface User {
@@ -12,8 +20,8 @@ const Page = () => {
   }
   
   const [user, setUser] = useState<User | null>(null);
-  const [hubs, setHubs] = useState([]);  
-  const [isModalVisible, setModalVisible] = useState(false); // To show/hide the form modal
+  const [hubs, setHubs] = useState<Hub[]>([]);  
+  const [isModalVisible, setModalVisible] = useState(false); 
   const router = useRouter();  
 
   const fetchUserData = async () => {
@@ -34,11 +42,8 @@ const Page = () => {
 
         if (hubsResponse.ok) {
           const hubsData = await hubsResponse.json();
-
-          // Sort the hubs so that online ones appear first
-          const sortedHubs = hubsData.sort((a: any, b: any) => (b.is_online ? 1 : 0) - (a.is_online ? 1 : 0));
-
-          setHubs(sortedHubs); // Set the sorted hubs
+          const sortedHubs = hubsData.sort((a: Hub, b: Hub) => (b.is_online ? 1 : 0) - (a.is_online ? 1 : 0));
+          setHubs(sortedHubs);
         } else {
           console.error('Failed to fetch smart hubs');
         }
@@ -52,24 +57,44 @@ const Page = () => {
     }
   };
 
-  // Fetch the user data and hubs when the component mounts
   useEffect(() => {
     fetchUserData(); 
   }, [router]);
 
-  // Callback to refresh the hubs after adding a new one
   const handleHubAdded = () => {
-    fetchUserData(); // Re-fetch the hubs when a new hub is added
+    fetchUserData();
   };
 
-  // Function to open the modal
   const openModal = () => {
     setModalVisible(true);
   };
 
-  // Function to close the modal
   const closeModal = () => {
     setModalVisible(false);
+  };
+
+  // Function to toggle hub status (online/offline)
+  const toggleHubStatus = async (hubId: string, newState: boolean) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SET_HUB_STATE_URL}/api/hubs/${hubId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_online: newState }),
+      });
+
+      if (response.ok) {
+        // Update the hub state after successfully toggling the status
+        setHubs((prevHubs) =>
+          prevHubs.map((hub: Hub) => (hub.id === hubId ? { ...hub, is_online: newState } : hub))
+        );
+      } else {
+        console.error('Failed to toggle hub status');
+      }
+    } catch (error) {
+      console.error('Error toggling hub status:', error);
+    }
   };
 
   if (!user) {
@@ -80,36 +105,32 @@ const Page = () => {
     <div className='grid grid-cols-2 lg:grid-cols-4 gap-5 p-10'>
       <div className='flex justify-between items-center col-span-2 lg:col-span-4'>
         <h1 className='text-2xl'>All devices</h1>
-        {/* Circular button with CirclePlus icon */}
-        <button 
-          onClick={openModal} 
-        >
+        <button onClick={openModal}>
           <CirclePlus size={24} color={'#9ca3af'} strokeWidth={2} absoluteStrokeWidth />
         </button>
       </div>
 
-      {/* Smart hubs list */}
       {hubs.length === 0 ? (
         <h2 className="col-span-2 lg:col-span-4 text-center">No hubs available. Please add a hub.</h2>
       ) : (
-        hubs.map((hub: any) => (
+        hubs.map((hub) => (
           <SmartHubCard 
             key={hub.id} 
             name={hub.hub_name} 
             id={hub.id} 
             location={hub.location} 
-            powerUsage={hub.powerUsage} 
+            powerUsage={hub.powerUsage || 0} 
             isOnline={hub.is_online} 
+            toggleHubStatus={toggleHubStatus} 
           />
         ))
       )}
 
-      {/* Add Hub Form Modal */}
       <AddSmartMeterForm 
         isVisible={isModalVisible}
         onClose={closeModal}
         onHubAdded={handleHubAdded}
-        userId={user.id}  // Pass the logged-in user's ID as a prop
+        userId={user.id} 
         hubId={''} 
         onMeterAdded={function (): void {
           throw new Error('Function not implemented.');

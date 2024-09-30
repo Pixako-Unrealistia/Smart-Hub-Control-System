@@ -1,23 +1,19 @@
-
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { buttonVariants } from "../components/ui/button";
 import Link from "next/link";
-import User from "../components/User";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
+export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/home");  
+  }, [router]);
+
   return (
     <div>
-      <h1 className="text-4xl">Home</h1>
-       <Link className={buttonVariants()} href='/home'> 
-          Open Home
-       </Link>
-
-       <h2>Client Session</h2>
-       <User />
-       <h2>Server Session</h2>
-       {JSON.stringify(session)}
+      <h1 className="text-4xl">Hello.....</h1>
     </div>
-    );
+  );
 }

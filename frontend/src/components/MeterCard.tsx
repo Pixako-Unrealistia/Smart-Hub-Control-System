@@ -61,7 +61,7 @@ const MeterCard: React.FC<MeterCardProps> = ({ hubid, meterid, name, location, p
         {isOnline && (
           <div className="flex items-center space-x-2">
             <Zap className="text-yellow-500" />
-            <span className="text-sm font-semibold">{powerUsage} kW / h</span>
+            <span className="text-sm font-semibold">{powerUsage} kWh / hh</span>
           </div>
         )}
       </div>
