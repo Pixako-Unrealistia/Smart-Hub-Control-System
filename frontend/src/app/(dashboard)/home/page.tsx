@@ -32,8 +32,13 @@ const Page = () => {
 
         if (response.ok) {
           const userData = await response.json();
+          console.log('User data fetched:', userData); // Debugging log for user data
           setUser(userData); // Set user data
-          fetchOnlineStatus(); // Fetch online hubs and meters count for the user
+
+          // Fetch online hubs and meters count for the user after user is set
+          if (userData?.id) {
+            fetchOnlineStatus(userData.id); // Pass userId explicitly
+          }
         } else {
           console.log('Invalid token or response issue, redirecting to sign-in');
           router.push('/sign-in'); // Token invalid or expired, redirect to login
@@ -45,24 +50,32 @@ const Page = () => {
     };
 
     // Fetch online hubs and meters
-    const fetchOnlineStatus = async () => {
+    const fetchOnlineStatus = async (userId: number) => {
       try {
-        const hubsResponse = await fetch(`${process.env.NEXT_PUBLIC_HUB_ONLINE_SERVICE_URL}/api/online-hubs`, {
+        console.log('Fetching online hubs for userId:', userId); // Debugging log
+
+        // Fetch online hubs for the user
+        const hubsResponse = await fetch(`${process.env.NEXT_PUBLIC_HUB_ONLINE_SERVICE_URL}/api/online-hubs/${userId}`, {
           method: 'GET',
         });
+
         if (hubsResponse.ok) {
           const hubsData = await hubsResponse.json();
-          setOnlineHubs(hubsData.online_hubs); // Set online hubs count from API
+          console.log('Hubs data fetched:', hubsData); // Debugging log for hubs data
+          setOnlineHubs(hubsData.online_hubs_count); // Assuming you return the count as 'online_hubs_count'
         } else {
           console.error('Failed to fetch online hubs');
         }
 
-        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_ONLINE_SERVICE_URL}/api/online-meters`, {
+        // Fetch online meters for the user
+        const metersResponse = await fetch(`${process.env.NEXT_PUBLIC_METER_ONLINE_SERVICE_URL}/api/online-meters/${userId}`, {
           method: 'GET',
         });
+
         if (metersResponse.ok) {
           const metersData = await metersResponse.json();
-          setOnlineMeters(metersData.online_meters); // Set online meters count from API
+          console.log('Meters data fetched:', metersData); // Debugging log for meters data
+          setOnlineMeters(metersData.online_meters_count); // Assuming you return the count as 'online_meters_count'
         } else {
           console.error('Failed to fetch online meters');
         }
@@ -71,7 +84,7 @@ const Page = () => {
       }
     };
 
-    fetchUserData();
+    fetchUserData(); // Fetch user data on mount
   }, [router]); // Only run once when the component mounts
 
   // Update `second` every second and fetch total meter usage only when on the home page
@@ -84,13 +97,16 @@ const Page = () => {
           // Update the second value (cycles between 0 and 59)
           setSecond((prevSecond) => (prevSecond >= 59 ? 0 : prevSecond + 1));
 
+          if (!user?.id) return; // Ensure user ID is available
+
           // Use the updated `second` value in the fetch URL
-          const usageResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_ALL_METER_USAGE_SERVICE_URL}/api/get-all-meter-usage/${second}`, {
+          const usageResponse = await fetch(`${process.env.NEXT_PUBLIC_GET_ALL_METER_USAGE_SERVICE_URL}/api/get-all-meter-usage/${user.id}/${second}`, {
             method: 'GET',
           });
 
           if (usageResponse.ok) {
             const usageData = await usageResponse.json();
+            console.log('Meter usage data:', usageData); // Debugging log for usage data
             setTotalUsage(usageData.total_usage); // Update the total usage
           } else {
             console.error('Failed to fetch meter usage');
@@ -112,7 +128,7 @@ const Page = () => {
         clearInterval(intervalId);
       }
     };
-  }, [second, pathname]); // Rerun when second or pathname changes
+  }, [second, pathname, user?.id]); // Rerun when second, pathname, or user ID changes
 
   if (!user) {
     return <h2>Loading...</h2>;
@@ -126,7 +142,6 @@ const Page = () => {
       <StatusCard value={onlineHubs} type='smarthub' />
       <StatusCard value={onlineMeters} type='meter' />
       <div className='col-span-2'>
-
         <UsageCard usage={totalUsage} unit="kWh/hh" />
       </div>
     </div>
