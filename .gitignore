@@ -1,3 +1,5 @@
 node_modules
 mock_data/halfhourly_dataset/*
 mock_data/individuals/*
+#*.pyc
+#__pycache__/
