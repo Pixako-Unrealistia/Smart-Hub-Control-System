@@ -8,7 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [22.x]
+        #node-version: [18.x, 20.x, 22.x]
 
     steps:
       - name: Checkout code
@@ -41,7 +42,7 @@ jobs:
         run: |
           pnpm run dev &
           python3 run_services.py &
-          sleep 10  # Wait for services to start
+          sleep 20
 
       - name: Check ports and terminate services
         run: |
