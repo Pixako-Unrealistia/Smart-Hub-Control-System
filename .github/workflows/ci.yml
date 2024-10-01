@@ -1,6 +1,6 @@
 name: Test CI
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   test:
@@ -37,7 +37,27 @@ jobs:
           npm install -g pnpm
           pnpm install
 
-          pnpm run dev & python3 run_services.py
+      - name: Start services
+        run: |
+          pnpm run dev &
+          python3 run_services.py &
+          sleep 10  # Wait for services to start
+
+      - name: Check ports and terminate services
+        run: |
+          check_ports() {
+            for port in "$@"; do
+              if ! nc -z localhost "$port"; then
+                echo "Port $port is not alive"
+                exit 1
+              fi
+            done
+          }
+
+          check_ports 3000 8000 8001 8002 8003
+          
+          pkill -f "pnpm run dev"
+          pkill -f "python3 run_services.py"
 
       - name: Always pass
         run: echo "PASS"
