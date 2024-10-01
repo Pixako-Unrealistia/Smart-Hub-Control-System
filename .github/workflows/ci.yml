@@ -32,8 +32,8 @@ jobs:
       - name: Build
         run: |
           git clone https://github.com/TetraHikari/halfhourly_reduced
-          mv meter-dataset/halfhourly_dataset ./mock_data/
-          rf -rf meter-dataset
+          mv halfhourly_reduced/halfhourly_dataset ./mock_data/
+          rm -rf meter-dataset
           npm install -g pnpm
           pnpm install
 
