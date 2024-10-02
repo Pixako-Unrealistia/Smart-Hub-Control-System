@@ -3,4 +3,3 @@ python-dotenv
 SQLAlchemy
 pandas
 uvicorn
-psycopg2-binary
