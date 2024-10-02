@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  get-online-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8005:8005"
