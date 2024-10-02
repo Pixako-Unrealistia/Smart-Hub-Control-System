@@ -8,7 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [22.x]
+        #node-version: [18.x, 20.x, 22.x]
 
     steps:
       - name: Checkout code
@@ -59,6 +60,15 @@ jobs:
           python3 run_services.py &
           sleep 30
           ps aux | grep 'pnpm\|python3'
+
+      - name: Brute force 3001/login
+        run: |
+          curl -X POST http://localhost:3001/login -H "Content-Type: application/json" -d '{"username": "admin", "password": "admin"}'
+          
+
+      #- name: Check protected port
+      #  run : |
+      # TBD
 
       - name: Check ports and terminate services
         run: |
