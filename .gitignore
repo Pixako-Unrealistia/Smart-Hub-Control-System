@@ -4,3 +4,7 @@ mock_data/individuals/*
 #*.pyc
 #__pycache__/
 *.pyc
+*.env
+*.env.example
+*.env.local
+*.env.staging
