@@ -1,25 +1,31 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.db import get_db
 from app.models.meter import Meter
+from app.models.smart_meter_hub import SmartMeterHub
 from app.handlers.meter_receiver_handler import read_meter_csv_index
 
 router = APIRouter()
 
-@router.get("/get-all-meter-usage/{index}")
-def get_all_meter_usage(index: int, db: Session = Depends(get_db)):
+@router.get("/get-all-meter-usage/{userId}/{index}")
+def get_all_meter_usage(userId: int, index: int, db: Session = Depends(get_db)):
     try:
-        # Query the database to get all online meters
-        online_meters = db.query(Meter.meter_id).filter(Meter.state == True).all()
+        # Step 1: Query all online meters belonging to the user's hubs by joining the smart_meter_hubs table
+        online_meters = (
+            db.query(Meter.meter_id)
+            .join(SmartMeterHub, Meter.hub_id == SmartMeterHub.id)  # Join meters with smart_meter_hubs on hub_id
+            .filter(Meter.state == True, SmartMeterHub.user_id == userId)  # Filter based on user_id in smart_meter_hubs
+            .all()
+        )
 
         # Debugging: Print the result of the query
-        print(f"Online meters fetched from database: {online_meters}")
+        print(f"Online meters fetched for user {userId}: {online_meters}")
 
         total_usage = 0
 
-        # Loop through each online meter and calculate total usage from CSV
+        # Step 2: Loop through each online meter and calculate total usage from CSV
         for meter in online_meters:
-            meter_id = meter[0]  # since it's a tuple (meter_id,)
+            meter_id = meter[0]  # Extract meter_id from tuple
             
             # Debugging: Print the meter_id being processed
             print(f"Processing meter_id: {meter_id}")
@@ -31,10 +37,10 @@ def get_all_meter_usage(index: int, db: Session = Depends(get_db)):
             print(f"Data fetched from CSV for meter {meter_id}: {usage_data}")
 
             if usage_data:
-                total_usage += usage_data["energy(kWh/hh)"]  # Adjust based on your CSV column
+                total_usage += usage_data.get("energy(kWh/hh)", 0)  # Adjust based on your CSV column
 
         # Debugging: Print the total usage calculated
-        print(f"Total usage for all online meters: {total_usage}")
+        print(f"Total usage for all online meters for user {userId}: {total_usage}")
 
         return {"total_usage": total_usage}
 
