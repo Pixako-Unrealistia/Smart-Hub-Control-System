@@ -71,7 +71,7 @@ jobs:
             done
           }
 
-          check_ports 3000 8002 8004 8005
+          check_ports 3000 8002 8003 8004 8005 8006
           
           pkill -f "pnpm run dev"
           pkill -f "python3 run_services.py"
