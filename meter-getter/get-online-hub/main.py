@@ -26,5 +26,7 @@ app.include_router(hub_router)
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8005))  # Use port from environment variable, default to 8005
+    # Use port from environment variable, default to 8005
+    port = int(os.getenv("PORT", 8005))
+    # Run the app with Uvicorn
     uvicorn.run(app, host="0.0.0.0", port=port)
