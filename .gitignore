@@ -1,10 +1,4 @@
 node_modules
 mock_data/halfhourly_dataset/*
 mock_data/individuals/*
-
-env
 .env
-*.env
-*.env.example
-*.env.local
-*.env.staging
