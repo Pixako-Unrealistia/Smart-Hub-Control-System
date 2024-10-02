@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-WORKDIR /app/meter-getter/get-all-meter-usage
+WORKDIR /app/get-all-meter-usage
 
 COPY requirements.txt .
 
