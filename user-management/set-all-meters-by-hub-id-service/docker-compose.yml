@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  set-all-meters-by-hub-id-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3011:3011"

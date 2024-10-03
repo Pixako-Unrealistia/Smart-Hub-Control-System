@@ -5,8 +5,12 @@ const addHub = async (user_id: number, hub_name: string, location: string, p0: a
     const newHub = await createHub(user_id, hub_name, location);
     return newHub;
   } catch (error) {
-    throw new Error(`Error adding hub: ${error.message}`);
-  }
+    if (error instanceof Error) {
+      throw new Error(`Error adding hub: ${error.message}`);
+    } else {
+      throw new Error('An unknown error occurred while adding hub');
+    }
+  } 
 };
 
 export default {
