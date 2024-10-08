@@ -1,12 +1,19 @@
+
 FROM node:18-alpine
 
 WORKDIR /app/auth
 
+RUN npm install -g pnpm
+
+
+
 COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm && pnpm install
+RUN pnpm install --no-frozen-lockfile
 
 COPY . .
+
+RUN pnpm run build
 
 EXPOSE 3001
 

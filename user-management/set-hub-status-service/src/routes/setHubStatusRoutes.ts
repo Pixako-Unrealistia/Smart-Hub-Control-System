@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import hubService from '../services/setHubStatusService'; // Ensure this path is correct
 
 const router = express.Router();
 
 // This endpoint will handle setting the hub's online status
-router.put('/hubs/:hubId/status', async (req: Request, res: Response) => {
+router.put('/hubs/:hubId/status', async (req, res) => {
   const { hubId } = req.params; // Get the hubId from the request parameters
   const { is_online } = req.body; // Get the status from the request body
 

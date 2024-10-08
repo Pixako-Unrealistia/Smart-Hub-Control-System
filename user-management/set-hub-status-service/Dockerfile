@@ -1,13 +1,16 @@
+
 FROM node:18-alpine
 
 WORKDIR /app/set-hub-status-service
 
+RUN npm install -g pnpm
+
 COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm && pnpm install
+RUN pnpm install --frozen-lockfile --production
 
-COPY . .
+COPY dist ./dist
 
 EXPOSE 3012
 
-CMD ["pnpm", "start"]
+CMD ["node", "dist/app.js"]
