@@ -15,6 +15,8 @@ def read_meter_csv_index(meter_id: str, index: int):
 
             # Full path to the CSV file
             file_path = os.path.join(FILE_PATH, FILENAME)
+            print(f"BASE_DIR resolved: {BASE_DIR}")
+            print(f"Full file path to check: {file_path}")
 
             # Check if the file exists
             if not os.path.exists(file_path):
