@@ -2,3 +2,5 @@ sqlalchemy
 pandas
 python-dotenv
 psycopg2-binary
+fastapi
+uvicorn
