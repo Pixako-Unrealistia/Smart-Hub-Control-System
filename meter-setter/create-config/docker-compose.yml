@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  create-config:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3013:3013"
