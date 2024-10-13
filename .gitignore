@@ -8,3 +8,5 @@ mock_data/individuals/*
 *.env.example
 *.env.local
 *.env.staging
+
+stub_data.json

@@ -63,12 +63,41 @@ jobs:
 
       - name: Brute force 3001/login
         run: |
-          curl -X POST http://localhost:3001/login -H "Content-Type: application/json" -d '{"username": "admin", "password": "admin"}'
-          
+          curl -X POST http://localhost:3001/login -H "Content-Type: application/json" -d '{"email": "admin@gmail.com", "password": "admin"}'
+
 
       #- name: Check protected port
       #  run : |
       # TBD
+
+      - name: Stub generation
+        run: |
+          echo "Generating stub data..."
+          pip install faker
+          python -c "
+          import json
+          import random
+          from faker import Faker
+
+          fake = Faker()
+          data = []
+          for _ in range(100):
+              data.append({
+                  'email': fake.email(),
+                  'password': fake.password(),
+              })
+
+          with open('testing/stub_data.json', 'w') as f:
+              json.dump(data, f)
+          "
+          echo "Stub data generated"
+
+      - name: Stress test
+        run: |
+          echo "Stress testing..."
+          curl -X POST http://localhost:3001/register -H "Content-Type: application/json" -d @testing/stub_data.json
+          echo "Stress test done"
+
 
       - name: Check ports and terminate services
         run: |
@@ -86,5 +115,5 @@ jobs:
           pkill -f "pnpm run dev"
           pkill -f "python3 run_services.py"
 
-      - name: Always pass
-        run: echo "PASS"
+      - name: CI deploy
+        run: echo "This is a mock deploy step"
