@@ -87,6 +87,17 @@ jobs:
                   'password': fake.password(),
               })
 
+          with open('stub_data.json', 'w') as f:
+              json.dump(data, f)
+          "
+          echo "Stub data generated"
+
+      - name: Stress test
+        run: |
+          echo "Stress testing..."
+          curl -X POST http://localhost:3001/register -H "Content-Type: application/json" -d @stub_data.json
+          echo "Stress test done"
+
 
       - name: Check ports and terminate services
         run: |
