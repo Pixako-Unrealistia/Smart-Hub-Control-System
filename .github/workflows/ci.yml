@@ -52,6 +52,7 @@ jobs:
           mv halfhourly_reduced/halfhourly_dataset ./mock_data/
           rm -rf meter-dataset
           npm install -g pnpm
+          rm pnpm-lock.yaml
           pnpm install
 
       - name: Start services
