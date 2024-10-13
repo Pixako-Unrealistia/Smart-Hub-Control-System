@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import createHubService from '../services/createHubService';
+import logger from '../utils/logger';
 
 export const createHub = async (req: Request, res: Response) => {
     const { user_id, hub_name, location, is_online } = req.body;

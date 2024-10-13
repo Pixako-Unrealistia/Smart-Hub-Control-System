@@ -1,47 +1,22 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { register, login, getMe } from '../controller/auth.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { Router } from 'express';
+import { register, login, getMe } from '../controller/auth.controller'; // Import the new `getMe` function
+import { authMiddleware } from '../middleware/auth.middleware';  // Middleware to check JWT
 
 const router = Router();
 
-// Register route
-router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await register(req, res);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+router.post('/register', register);
+router.post('/login', login);
 
-// Login route
-router.post('/login', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await login(req, res);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+router.get('/me', authMiddleware, getMe);  // Protected route to get user data
 
-// Protected route to get the current user's data
-router.get('/me', authMiddleware, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await getMe(req, res);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Logout route
-router.post('/logout', (req: Request, res: Response): void => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+router.post('/logout', (req, res) => {
+    // Clear the 'token' cookie
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',  // Only secure in production
+      sameSite: 'Strict',
+    });
+    return res.status(200).json({ message: 'Logged out successfully' });
   });
-  res.status(200).json({ message: 'Logged out successfully' });
-});
-
+  
 export default router;

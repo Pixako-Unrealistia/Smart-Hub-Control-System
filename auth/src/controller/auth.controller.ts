@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwt.util';
 import { pool } from '../db';  // Assuming you have a Postgres connection pool
 

@@ -7,12 +7,10 @@ import pandas as pd
 def read_meter_csv_index(meter_id: str, index: int):
     try:
         IDENTIFIER = meter_id
-        BASE_DIR = "/app"
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         print(f"BASE_DIR: {BASE_DIR}")
-
-        # Construct the file path to the individuals directory
-        FILE_PATH = os.path.join(BASE_DIR, "mock_data", "individuals")
-        print(f"FILE_PATH: {FILE_PATH}")  
+        FILE_PATH = os.path.join(BASE_DIR, "..", "..", "mock_data", "individuals")
+        print(f"FILE_PATH: {FILE_PATH}")
         FILENAME = f"{meter_id}.csv"
 
         # Full path to the CSV file

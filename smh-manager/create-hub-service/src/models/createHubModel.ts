@@ -1,6 +1,7 @@
 import db from '../utils/db';
 
 export const createHub = async (user_id: number, hub_name: string, location: string, is_online: boolean = false) => {
+  try {
     console.log("Executing DB query with data:", { user_id, hub_name, location, is_online });
 
     const result = await db.query(
@@ -10,4 +11,7 @@ export const createHub = async (user_id: number, hub_name: string, location: str
     
     console.log("DB result:", result.rows[0]);
     return result.rows[0];
+  } catch (error) {
+    throw new Error(`Error creating hub: ${error.message}`);
+  }
 };

@@ -1,8 +1,6 @@
 // src/types/express/index.d.ts
 
 import { Request } from 'express';
-import { User } from '../models/user.model'; 
-
 
 declare global {
     namespace Express {

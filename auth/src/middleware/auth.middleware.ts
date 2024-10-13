@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt.util';  // Your JWT verification function
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;  // Extract the token from cookies
 
   if (!token) {
-    res.status(401).json({ message: 'Unauthorized' });  // Send response but don't return it explicitly
-    return;  // Explicitly return to stop further execution
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
   try {
@@ -18,7 +17,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     next();  // Proceed to the next middleware or controller
   } catch (error) {
     console.error('Error verifying token:', error);
-    res.status(401).json({ message: 'Unauthorized' });  // Send the response
-    return;  // Explicitly return after sending a response
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 };
