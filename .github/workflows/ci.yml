@@ -70,7 +70,7 @@ jobs:
       #  run : |
       # TBD
 
-      - name: Stub stress test
+      - name: Stub generation
         run: |
           echo "Generating stub data..."
           pip install faker
@@ -87,7 +87,7 @@ jobs:
                   'password': fake.password(),
               })
 
-          with open('stub_data.json', 'w') as f:
+          with open('testing/stub_data.json', 'w') as f:
               json.dump(data, f)
           "
           echo "Stub data generated"
@@ -95,7 +95,7 @@ jobs:
       - name: Stress test
         run: |
           echo "Stress testing..."
-          curl -X POST http://localhost:3001/register -H "Content-Type: application/json" -d @stub_data.json
+          curl -X POST http://localhost:3001/register -H "Content-Type: application/json" -d @testing/stub_data.json
           echo "Stress test done"
 
 
