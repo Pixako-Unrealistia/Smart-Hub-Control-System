@@ -52,7 +52,6 @@ jobs:
           mv halfhourly_reduced/halfhourly_dataset ./mock_data/
           rm -rf meter-dataset
           npm install -g pnpm
-          rm pnpm-lock.yaml
           pnpm install
 
       - name: Start services
@@ -71,9 +70,9 @@ jobs:
       #  run : |
       # TBD
 
-      - name: Stub generation
+      - name: Mock generation
         run: |
-          echo "Generating stub data..."
+          echo "Generating data..."
           pip install faker
           python -c "
           import json
@@ -91,7 +90,7 @@ jobs:
           with open('testing/stub_data.json', 'w') as f:
               json.dump(data, f)
           "
-          echo "Stub data generated"
+          echo "Mock data generated"
 
       - name: Stress test
         run: |
